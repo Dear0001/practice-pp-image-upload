@@ -9,8 +9,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +27,10 @@ public class FileController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value= "/single_post")
     public ResponseEntity<?> uploadFile(@RequestParam MultipartFile file) throws IOException {
         String fileName = fileService.saveFile(file);
-        String fileUrl = "http://localhost:8080/files?fileName=" + fileName;
+//        String fileUrl = "http://localhost:8080/files?fileName=" + fileName;
+        String fileUrl = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path(fileName).toUriString();
         FileResponse fileResponse = new FileResponse(fileName,fileUrl,file.getContentType(), file.getSize());
         ApiResponse<FileResponse> response = ApiResponse.<FileResponse>builder()
                 .message("successfully uploaded file")
@@ -40,7 +45,10 @@ public class FileController {
         List<FileResponse> fileResponses = new ArrayList<>();
         for (MultipartFile file : files) {
             String fileName = fileService.saveFile(file);
-            String fileUrl = "http://localhost:8080/files?fileName=" + fileName;
+//            String fileUrl = "http://localhost:8080/files?fileName=" + fileName;
+            String fileUrl = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path(fileName).toUriString();
             fileResponse = new FileResponse(fileName, fileUrl, file.getContentType(), file.getSize());
             fileResponses.add(fileResponse);
         }
